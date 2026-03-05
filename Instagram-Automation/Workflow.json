@@ -1,0 +1,113 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "058c1c68-8d89-44dc-9adb-9136e310159f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "adb91d5a-3f37-4500-b5bb-da71f458fa3d",
+              "name": "imageUrl",
+              "value": "https://th-i.thgim.com/public/entertainment/movies/co3f7l/article68358912.ece/alternates/FREE_1200/kalidas.jpg",
+              "type": "string"
+            },
+            {
+              "id": "1abc6cfb-f61a-4b51-9509-93f59a587ee2",
+              "name": "caption",
+              "value": "handsome",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "539d1e61-3e64-46f3-b956-95a7b941703e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://app.ayrshare.com/api/post",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer DDCD3E14-4F82445B-B1B1593D-21CC12D9"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"post\": \"{{ $json.caption }}\", \"platforms\": [\"instagram\", \"facebook\"], \"mediaUrls\": [\"{{ $json.imageUrl }}\"]}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "90aebb5c-2c0f-4a70-9543-46410bfdd0fa",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "6fc79f5a-829b-4498-a5d7-c56cd6f7008e",
+  "meta": {
+    "instanceId": "90950320ab7dfb1fac506ec5509f9d6f54a11c6e2ca3d3e7b9ff729c4c2f579b"
+  },
+  "id": "FVj6PniRaI0ORpSw",
+  "tags": []
+}

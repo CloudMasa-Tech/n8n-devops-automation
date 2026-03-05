@@ -1,0 +1,221 @@
+{
+    "name": "LinkedIn Image Posting",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "receive-post-title",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "id": "1c063a21-324e-4cc6-9001-d4f7e78e082b",
+        "name": "Receive Post Title",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1,
+        "position": [
+          -8464,
+          -416
+        ],
+        "webhookId": "5062f013-bbc4-4c9c-8767-13b00dd94127",
+        "notesInFlow": false
+      },
+      {
+        "parameters": {
+          "respondWith": "text",
+          "responseBody": "your workflow is completed",
+          "options": {
+            "responseCode": 200
+          }
+        },
+        "id": "c903811f-9121-4b16-a298-1d2b9c50fa16",
+        "name": "Show Confirmation",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1,
+        "position": [
+          -7456,
+          -400
+        ],
+        "alwaysOutputData": false,
+        "notesInFlow": false
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=Write a LinkedIn post using this title:\n{{$binary.data ? \"Image attached\" : \"No image\"}}\n\nAn image is attached to this request. Write a suitable caption for a professional LinkedIn post.",
+          "hasOutputParser": true,
+          "options": {
+            "systemMessage": "Your task is to create high-quality, professional LinkedIn posts based on the title provided by the user.\n\nWrite in clear and polished English that is easy for both technical and non-technical audiences to understand.\n\nUse short paragraphs for readability.\n\nDo not use bullet points.\n\nDo not use asterisks.\n\nDo not use bold, italics, or any Markdown formatting.\n\nDo not use asterisks.\n\nDo not use bold, italics, or any Markdown formatting.\n\nDo not use special characters for formatting.\n\nKeep the tone professional, confident, and positive.\n\nBriefly explain why the topic is important and its practical relevance.\n\nEnd the post with 5–10 relevant hashtags.\n\nDo not use emojis.\n\nDo not include explanations, headings, labels, or meta commentary.\n\nDo not mention AI, prompts, or instructions.\n\nOutput only plain text suitable for direct posting on LinkedIn.",
+            "passthroughBinaryImages": true
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          -8240,
+          -288
+        ],
+        "id": "216088ac-fcf9-4a7c-8a8d-f305e5cc55fa",
+        "name": "AI Agent"
+      },
+      {
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "=linkedin-post-session",
+          "contextWindowLength": 10
+        },
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "typeVersion": 1.3,
+        "position": [
+          -8112,
+          -64
+        ],
+        "id": "fc18614c-f2a1-464e-a7c1-01160cbfdc78",
+        "name": "Simple Memory"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          -8240,
+          -64
+        ],
+        "id": "5855c4ee-5360-42c0-86c8-c1b95a89f87f",
+        "name": "Google Gemini Chat Model",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "OyPQ4azXYXZdPqpu",
+            "name": "Google Gemini(PaLM) Api account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "person": "WobOM-vX4K",
+          "text": "={{ $json.output }}",
+          "shareMediaCategory": "IMAGE",
+          "binaryPropertyName": "image_0",
+          "additionalFields": {}
+        },
+        "id": "47d2aa50-235a-4181-b08d-e2302ba68d8a",
+        "name": "Post to LinkedIn",
+        "type": "n8n-nodes-base.linkedIn",
+        "typeVersion": 1,
+        "position": [
+          -7664,
+          -400
+        ],
+        "alwaysOutputData": false,
+        "credentials": {
+          "linkedInOAuth2Api": {
+            "id": "L1Y3SM7eCf3WBEZW",
+            "name": "LinkedIn account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          -7888,
+          -400
+        ],
+        "id": "b2520498-030e-4aa5-b151-5b5994d0db30",
+        "name": "Merge"
+      }
+    ],
+    "pinData": {},
+    "connections": {
+      "Receive Post Title": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Simple Memory": {
+        "ai_memory": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Google Gemini Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Post to LinkedIn": {
+        "main": [
+          [
+            {
+              "node": "Show Confirmation",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge": {
+        "main": [
+          [
+            {
+              "node": "Post to LinkedIn",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "active": false,
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate",
+      "availableInMCP": false
+    },
+    "versionId": "2d010a27-380c-4e2b-af07-3d7b5aa3d491",
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "d2590abd711ea5bf61de524c015577b8b41ae01f85b340d06fe3afd7ec302e19"
+    },
+    "id": "1fNz8cSh2HdVTPSc",
+    "tags": []
+  }

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Excel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f0f0f0;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input[type="file"] {
+            margin-bottom: 20px;
+            padding: 10px;
+            width: 100%;
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>📊 Upload Excel to n8n</h2>
+        <input type="file" id="fileInput" accept=".xlsx, .xls" />
+        <button onclick="uploadFile()">Upload File</button>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const status = document.getElementById('status');
+
+            if (!fileInput.files[0]) {
+                status.textContent = '⚠️ Please select a file first!';
+                status.className = 'error';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            status.textContent = '⏳ Uploading...';
+            status.className = '';
+
+            try {
+                const response = await fetch('http://localhost:5678/webhook-test/excel-file', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    status.textContent = '✅ File uploaded successfully!';
+                    status.className = 'success';
+                } else {
+                    status.textContent = '❌ Upload failed. Try again.';
+                    status.className = 'error';
+                }
+            } catch (err) {
+                status.textContent = '❌ Error: ' + err.message;
+                status.className = 'error';
+            }
+        }
+    </script>
+
+</body>
+
+</html><!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Excel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f0f0f0;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input[type="file"] {
+            margin-bottom: 20px;
+            padding: 10px;
+            width: 100%;
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .radio-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .radio-group label {
+            margin-right: 20px;
+            font-size: 16px;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h2>📊 Upload Excel to n8n</h2>
+
+        <!-- RADIO BUTTONS -->
+        <div class="radio-group">
+            <label>
+                <input type="radio" name="courseType" value="PVT">
+                PVT
+            </label>
+
+            <label>
+                <input type="radio" name="courseType" value="LLB">
+                LLB
+            </label>
+        </div>
+
+        <!-- FILE INPUT -->
+        <input type="file" id="fileInput" accept=".xlsx, .xls" />
+
+        <button onclick="uploadFile()">Upload File</button>
+
+        <p id="status"></p>
+
+    </div>
+
+    <script>
+
+        async function uploadFile() {
+
+            const fileInput = document.getElementById('fileInput');
+            const status = document.getElementById('status');
+
+            // GET SELECTED RADIO VALUE
+            const selectedRadio = document.querySelector('input[name="courseType"]:checked');
+
+            if (!selectedRadio) {
+                status.textContent = '⚠️ Please select PVT or LLB!';
+                status.className = 'error';
+                return;
+            }
+
+            if (!fileInput.files[0]) {
+                status.textContent = '⚠️ Please select a file first!';
+                status.className = 'error';
+                return;
+            }
+
+            const formData = new FormData();
+
+            formData.append('file', fileInput.files[0]);
+
+            // APPEND RADIO VALUE
+            formData.append('courseType', selectedRadio.value);
+
+            status.textContent = '⏳ Uploading...';
+            status.className = '';
+
+            try {
+
+                const response = await fetch(
+                    'http://localhost:5678/webhook-test/excel-file',
+                    {
+                        method: 'POST',
+                        body: formData,
+                    }
+                );
+
+                if (response.ok) {
+
+                    status.textContent = '✅ File uploaded successfully!';
+                    status.className = 'success';
+
+                } else {
+
+                    status.textContent = '❌ Upload failed.';
+                    status.className = 'error';
+
+                }
+
+            } catch (err) {
+
+                status.textContent = '❌ Error: ' + err.message;
+                status.className = 'error';
+
+            }
+
+        }
+
+    </script>
+
+</body>
+
+</html>

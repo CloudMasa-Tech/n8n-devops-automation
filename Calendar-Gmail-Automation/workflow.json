@@ -1,0 +1,151 @@
+{
+    "name": "gmail/calender",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "triggerAtHour": 9,
+                "triggerAtMinute": 9
+              },
+              {}
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          0,
+          0
+        ],
+        "id": "b3d3992e-4f0f-4554-b211-9fdfbea3ad96",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "calendar": {
+            "__rl": true,
+            "value": "brkavi2006@gmail.com",
+            "mode": "id"
+          },
+          "returnAll": true,
+          "timeMin": "={{ $now.toISO() }}",
+          "timeMax": "={{ $now.plus({hours: 24}).toISO() }}",
+          "options": {
+            "orderBy": "startTime",
+            "timeZone": {
+              "__rl": true,
+              "value": "Asia/Kolkata",
+              "mode": "list",
+              "cachedResultName": "Asia/Kolkata"
+            }
+          }
+        },
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          208,
+          16
+        ],
+        "id": "17192a5a-8e10-4d5f-bdc8-9475587033d1",
+        "name": "Get many events",
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "siddsldOKeKxTImC",
+            "name": "Google Calendar account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const events = [];\n\nfor (const item of items) {\n  events.push(item.json);\n}\n\nlet eventRows = '';\n\nfor (const event of events) {\n  let time = 'All Day';\n  \n  if (event.start && event.start.dateTime) {\n    const d = new Date(event.start.dateTime);\n    let hours = d.getHours();\n    let minutes = d.getMinutes();\n    const ampm = hours >= 12 ? 'PM' : 'AM';\n    hours = hours % 12;\n    hours = hours ? hours : 12;\n    minutes = minutes < 10 ? '0' + minutes : minutes;\n    time = hours + ':' + minutes + ' ' + ampm;\n  }\n\n  eventRows += '<div style=\"background:#f0f8ff; padding:15px; margin:10px 0; border-left:4px solid #4285f4; border-radius:4px;\">';\n  eventRows += '<h3 style=\"margin:0; color:#4285f4;\">📌 ' + (event.summary || 'No Title') + '</h3>';\n  eventRows += '<p><strong>⏰ Time:</strong> ' + time + '</p>';\n  eventRows += '<p><strong>📍 Location:</strong> ' + (event.location || 'Not specified') + '</p>';\n  eventRows += '<p><strong>📝 Description:</strong> ' + (event.description || 'No description') + '</p>';\n  eventRows += '</div>';\n}\n\nif (eventRows === '') {\n  eventRows = '<p>No events for today!</p>';\n}\n\nconst html = '<div style=\"font-family:Arial; max-width:600px; margin:auto;\">'\n  + '<h2 style=\"color:#4285f4;\">📅 Good Morning Barkavi!</h2>'\n  + '<p>Here are all your events for today:</p>'\n  + '<hr/>'\n  + eventRows\n  + '<hr/>'\n  + '<p style=\"color:gray; font-size:12px;\">⚡ Sent automatically at 9 AM via n8n workflow</p>'\n  + '</div>';\n\nreturn [{ json: { emailBody: html } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          416,
+          16
+        ],
+        "id": "5a5b8d11-f0c0-4864-8270-5c0aff7c59f8",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "sendTo": "brkavi2006@gmail.com",
+          "subject": "=Good Morning! Your Events for Today - {{ $now.format('dd MMM yyyy') }}",
+          "message": "=  {{ $json.emailBody }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          624,
+          16
+        ],
+        "id": "cd1e4340-fe72-41b9-a89f-44d3182cb221",
+        "name": "Send a message",
+        "webhookId": "b56447a5-5e1e-4ca0-92de-b0fa845d6dc4",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "LVQXBVhfBJnOyzEg",
+            "name": "Gmail account 3"
+          }
+        }
+      }
+    ],
+    "pinData": {},
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get many events",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get many events": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Send a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "active": false,
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate",
+      "availableInMCP": false,
+      "timeSavedMode": "fixed",
+      "timezone": "Asia/Kolkata",
+      "callerPolicy": "workflowsFromSameOwner",
+      "executionTimeout": -1
+    },
+    "versionId": "9c7d8ac9-2e97-40d5-bd29-43232ea315af",
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "63a97d52b8b699f13f18b2eb934b18652e3648610e19e0fd63930985bbeb587c"
+    },
+    "id": "cUs1pvxVeA3HuhEF",
+    "tags": []
+  }

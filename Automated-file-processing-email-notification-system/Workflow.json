@@ -1,0 +1,230 @@
+{
+  "name": "Venkat_Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        144,
+        -112
+      ],
+      "id": "5dc4dd78-f254-4664-a2dd-0dde287fa41d",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "https://drive.google.com/file/d/1jsYfaYk17jv3sjbtBoyeQzI_9WdI-g9z/view?usp=drive_link",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        384,
+        -112
+      ],
+      "id": "f8366b9e-2355-4d13-a3a8-e1d5ff5eb73b",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "mOli3M6Dtuw514K9",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "compress",
+        "fileName": "RecentlyAddedFile"
+      },
+      "type": "n8n-nodes-base.compression",
+      "typeVersion": 1.1,
+      "position": [
+        656,
+        -112
+      ],
+      "id": "3ebc8e39-61dd-4d77-96dd-2205c4c72c04",
+      "name": "Compression"
+    },
+    {
+      "parameters": {
+        "sendTo": "kaaaran28@gmail.com",
+        "subject": "N8n Automation",
+        "message": "This is the zipped file from the folder and after you receive this message the file will be automatically deleted from the automation workflow ",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        -112
+      ],
+      "id": "f5744f10-64ce-4135-9d0c-409bd0f2a01d",
+      "name": "Send a message",
+      "webhookId": "ff4296f5-c9be-4922-8011-c97db76b9a86",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "yTzBagIeecGnaXP2",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "https://drive.google.com/file/d/1jsYfaYk17jv3sjbtBoyeQzI_9WdI-g9z/view?usp=drive_link",
+          "mode": "url"
+        },
+        "options": {
+          "deletePermanently": false
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        544,
+        144
+      ],
+      "id": "f0ef0b63-8936-4f61-9f8a-0067e4443227",
+      "name": "Delete a file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "mOli3M6Dtuw514K9",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "kaaaran28@gmail.com",
+        "subject": "N8n Automation Done ",
+        "message": "The sended zip file deletred successfully ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        144
+      ],
+      "id": "59dd798b-507c-448b-a74d-a7f696688bd0",
+      "name": "Send a message1",
+      "webhookId": "ff4296f5-c9be-4922-8011-c97db76b9a86",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "yTzBagIeecGnaXP2",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        288,
+        144
+      ],
+      "id": "76f06310-2146-4532-8e5d-bb4953f6568f",
+      "name": "Wait",
+      "webhookId": "667ff7f0-f8e9-44b2-aedb-f8a736532144"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Compression",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compression": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a file": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Delete a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "b352fe85-557a-4c28-b197-6012248b684e",
+  "meta": {
+    "instanceId": "43d140dd61c3945a1199d37c1fc724ad261c1ceaab2b95f2209fc2db179975f8"
+  },
+  "id": "SaOIIp9vQjjFQJfb",
+  "tags": []
+}
