@@ -1,0 +1,300 @@
+{
+    "name": "My workflow 5",
+    "nodes": [
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "1421yI5dAJfQSKyA223RCKRYXDOatgg3OPJgd6edimjs"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Sheet1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1421yI5dAJfQSKyA223RCKRYXDOatgg3OPJgd6edimjs/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [
+              "id"
+            ],
+            "schema": [
+              {
+                "id": "id",
+                "displayName": "id",
+                "required": false,
+                "defaultMatch": true,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "name",
+                "displayName": "name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "service",
+                "displayName": "service",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "legal_fee_category",
+                "displayName": "legal_fee_category",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "legal_fee",
+                "displayName": "legal_fee",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "govt_fee_category",
+                "displayName": "govt_fee_category",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "govt_fee",
+                "displayName": "govt_fee",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "total",
+                "displayName": "total",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "date",
+                "displayName": "date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          352,
+          -32
+        ],
+        "id": "e72f6adc-ffff-4b2e-8c06-757a09483198",
+        "name": "Append row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "rLlpU6gSGIeYratV",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "triggerAtHour": 13,
+                "triggerAtMinute": 3
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -320,
+          -32
+        ],
+        "id": "f8449449-2338-4c28-be3f-5493c6555657",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\n\nif (items.length > 0) {\n  return items.map(item => {\n    return {\n      json: {\n        id: item.json.id,\n        name: item.json.name,\n        service: item.json.service,\n        legal_fee_category: item.json.legal_fee_category,\n        legal_fee: item.json.legal_fee,\n        govt_fee_category: item.json.govt_fee_category,\n        govt_fee: item.json.govt_fee,\n        total: item.json.total,\n        date: item.json.date\n      }\n    };\n  });\n} else {\n  return [\n    {\n      json: {\n        message: \"No Data Found\"\n      }\n    }\n  ];\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          128,
+          -32
+        ],
+        "id": "af99707e-0a94-466b-acdf-11deb9e1ac85",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT * FROM service WHERE date >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)    AND date <= CURDATE();",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.mySql",
+        "typeVersion": 2.5,
+        "position": [
+          -96,
+          -32
+        ],
+        "id": "299bb064-01b3-439f-8162-46f00584890a",
+        "name": "Execute a SQL query",
+        "credentials": {
+          "mySql": {
+            "id": "Replace with your id",
+            "name": "Replace withh your name"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "aggregate": "aggregateAllItemData",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.aggregate",
+        "typeVersion": 1,
+        "position": [
+          576,
+          -32
+        ],
+        "id": "029dbfaf-26ba-4ca0-8637-90ec8c9971b0",
+        "name": "Aggregate"
+      },
+      {
+        "parameters": {
+          "sendTo": "example@gmail.com",
+          "subject": "Report Generated",
+          "message": "Here the file is: https://docs.google.com/spreadsheets/d/1421yI5dAJfQSKyA223RCKRYXDOatgg3OPJgd6edimjs/edit?gid=0#gid=0",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          800,
+          -32
+        ],
+        "id": "Replace with your id",
+        "name": "Send a message",
+        "webhookId": "44b13c8b-6fe5-4324-8192-d59ecd8a0885",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "Replace with your id",
+            "name": "Gmail account"
+          }
+        }
+      }
+    ],
+    "pinData": {},
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Execute a SQL query",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Append row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append row in sheet": {
+        "main": [
+          [
+            {
+              "node": "Aggregate",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute a SQL query": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Aggregate": {
+        "main": [
+          [
+            {
+              "node": "Send a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "active": false,
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate",
+      "availableInMCP": false
+    },
+    "versionId": "6be197dd-fc66-4ac3-8bb6-ac88cb05e5d7",
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "40f2547ad78e2e165ce14b0f36c7305a312d1d447f0b67a9c794fbaeee9d4a7a"
+    },
+    "id": "Pm3LW5i7eNcL2BPX",
+    "tags": []
+  }
